@@ -10,7 +10,7 @@ import glob
 import xarray as xr
 import pickle
 # Import models from models.py
-from seg_models import UnetModel, FPNModel, PSPNetModel, DeepLabV3Model, PANModel
+from seg_models import UnetModel, FPNModel, PSPNetModel, DeepLabV3Model, PANModel,UnetPlusPlusModel,MAnetModel,DeepLabV3PlusModel
 import wandb
 import matplotlib.pyplot as plt
 
@@ -130,7 +130,7 @@ def main(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size,shuffle=False)
 
     # Instantiate the model
-    model_cls = {"Unet": UnetModel, "FPN": FPNModel, "PSPNet": PSPNetModel, "DeepLabV3": DeepLabV3Model, "PAN": PANModel}
+    model_cls = {"Unet": UnetModel, "FPN": FPNModel, "PSPNet": PSPNetModel, "DeepLabV3": DeepLabV3Model, "PAN": PANModel, "Unet++":UnetPlusPlusModel,"MAnet":MAnetModel,"DeepLabV3+":DeepLabV3Model}
     model = model_cls[args.model_name](encoder_name=args.encoder_name, in_channels=len(args.input_vars), classes=1)
     print(f'Model is {model}')
     model=model.to(device)
