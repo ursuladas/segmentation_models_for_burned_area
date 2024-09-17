@@ -64,6 +64,10 @@ class UnetModel(BaseSegmentationModel):
     def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
         super(UnetModel, self).__init__(model_name="Unet", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
 
+class UnetPlusPlusModel(BaseSegmentationModel):
+    def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
+        super(UnetPlusPlusModel, self).__init__(model_name="Unet++", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
+
 class FPNModel(BaseSegmentationModel):
     def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
         super(FPNModel, self).__init__(model_name="FPN", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
@@ -76,6 +80,14 @@ class DeepLabV3Model(BaseSegmentationModel):
     def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
         super(DeepLabV3Model, self).__init__(model_name="DeepLabV3", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
 
+class DeepLabV3PlusModel(BaseSegmentationModel):
+    def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
+        super(DeepLabV3Model, self).__init__(model_name="DeepLabV3+", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
+
 class PANModel(BaseSegmentationModel):
     def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
         super(PANModel, self).__init__(model_name="PAN", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
+
+class MAnetModel(BaseSegmentationModel):
+    def __init__(self, encoder_name='resnet34', in_channels=3, classes=1, encoder_weights=None):
+        super(PANModel, self).__init__(model_name="MAnet", encoder_name=encoder_name, in_channels=in_channels, classes=classes, encoder_weights=encoder_weights)
