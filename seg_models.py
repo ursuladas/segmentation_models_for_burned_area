@@ -18,6 +18,21 @@ class BaseSegmentationModel(nn.Module):  # Inherit from nn.Module
                             in_channels=self.in_channels, 
                             classes=self.classes, 
                             encoder_weights=self.encoder_weights)
+        elif self.model_name == "Unet++":
+            return smp.UnetPlusPlus(encoder_name=self.encoder_name, 
+                           in_channels=self.in_channels, 
+                           classes=self.classes, 
+                           encoder_weights=self.encoder_weights)
+        elif self.model_name == "DeepLabV3+":
+            return smp.DeepLabV3Plus(encoder_name=self.encoder_name, 
+                           in_channels=self.in_channels, 
+                           classes=self.classes, 
+                           encoder_weights=self.encoder_weights)
+        elif self.model_name == "MAnet":
+            return smp.MAnet(encoder_name=self.encoder_name, 
+                           in_channels=self.in_channels, 
+                           classes=self.classes, 
+                           encoder_weights=self.encoder_weights)
         elif self.model_name == "FPN":
             return smp.FPN(encoder_name=self.encoder_name, 
                            in_channels=self.in_channels, 
