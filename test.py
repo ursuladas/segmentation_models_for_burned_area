@@ -12,6 +12,8 @@ import pickle
 import matplotlib.pyplot as plt
 # Import models from models.py
 from seg_models import UnetModel, FPNModel, PSPNetModel, DeepLabV3Model, PANModel
+import cv2
+from qual_metrics import compute_centroid_mse
 
 # Import your dataset class
 from datamodule import SegmentationDataset  # Replace with your actual dataset class
@@ -20,6 +22,7 @@ from datamodule import SegmentationDataset  # Replace with your actual dataset c
 def evaluate(model, loader, criterion,device):
     model.eval()
     val_losses=[]
+    centroid_mse_list=[]
     with torch.no_grad():
         for x_val, y_val in loader:
             x_val = x_val.to(device)
@@ -33,12 +36,20 @@ def evaluate(model, loader, criterion,device):
             predictions = (predictions > threshold).float()
             val_losses.append(loss.item())
 
+            # Compute centroid MSE for the batch
+            centroid_mse = compute_centroid_mse(predictions, y_val)
+            if centroid_mse is not None:
+                centroid_mse_list.append(centroid_mse)
+
+
     avg_loss = sum(val_losses) / len(val_losses)
+    avg_centroid_mse = sum(centroid_mse_list) / len(centroid_mse_list) if len(centroid_mse_list) > 0 else None
+
        # Save the predictions and ground truths
-    torch.save(predictions, 'test_predictions.pt')
-    torch.save(y_val, 'test_ground_truth.pt')
+    # torch.save(predictions, 'test_predictions.pt')
+    # torch.save(y_val, 'test_ground_truth.pt')
     
-    return predictions,avg_loss
+    return predictions,avg_loss,avg_centroid_mse
 
 def visualize_predictions(pred_path, gt_path, batch_idx=0):
 
@@ -49,6 +60,7 @@ def visualize_predictions(pred_path, gt_path, batch_idx=0):
     # Convert to numpy arrays for visualization
     predictions_np = predictions[batch_idx, 0,:,:].detach().to('cpu').numpy()
     ground_truth_np = ground_truth[batch_idx,0,:,:].detach().to('cpu').numpy()
+ 
 
     # Create and save composite image
     create_composite_image(ground_truth_np, predictions_np, colorbar_range=(0, 1))
@@ -102,7 +114,7 @@ def main(args):
     # Instantiate the model
     model_cls = {"Unet": UnetModel, "FPN": FPNModel, "PSPNet": PSPNetModel, "DeepLabV3": DeepLabV3Model, "PAN": PANModel}
     model = model_cls[args.model_name](encoder_name=args.encoder_name, in_channels=len(args.input_vars), classes=1)
-    model.load_state_dict(torch.load('/home/udas/Desktop/UD_Data_Copy/Segmentation_Models/best_model.pth'))
+    model.load_state_dict(torch.load('/home/udas/Desktop/UD_Data_Copy/Segmentation_Models/models/best_model.pth'))
     model=model.to(device)
 
     # Loss and optimizer
@@ -118,8 +130,8 @@ def main(args):
     elif loss=='ts':
         criterion=smp.losses.TverskyLoss(mode='binary', classes=1, log_loss=False, from_logits=True,eps=1e-07, alpha=0.3, beta=0.7, gamma=1.0)[source]
 
-    test_prediction,test_epoch_loss = evaluate(model, test_loader, criterion,device)
-    print("Test Loss: {:.6f}".format(test_epoch_loss))
+    test_prediction,test_epoch_loss,test_centroid_mse = evaluate(model, test_loader, criterion,device)
+    print(f"Test Loss: {test_epoch_loss:.6f} and Test Centroid {test_centroid_mse}")
     # Call the visualization function
     visualize_predictions('./test_predictions.pt', './test_ground_truth.pt', batch_idx=0)
 
