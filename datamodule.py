@@ -6,7 +6,7 @@ import random
 
 
 class SegmentationDataset(Dataset):
-    def __init__(self, datasets,stat_dict,target,input_vars,crop_size=0,stat='mean_std'):
+    def __init__(self, datasets,stat_dict,target,input_vars,crop_size=0,rotate=False,stat='mean_std'):
         """
         Args:
             datasets (list of xarray datasets): List of monotemporal datasets 
@@ -22,6 +22,7 @@ class SegmentationDataset(Dataset):
         self.input_vars=input_vars
         self.target = target
         self.crop_size=crop_size
+        self.rotate=rotate
 
         #Uncomment and modify args if using source pkl file
         # self.min_max_dict = min_max_dict
@@ -114,8 +115,16 @@ class SegmentationDataset(Dataset):
                     end_y = start_y + self.crop_size
                     inputs = inputs[start_x:end_x, start_y:end_y,:]
                     target = target[start_x:end_x, start_y:end_y,:]
-        inputs=torch.tensor(inputs, dtype=torch.float32)
-        target=torch.tensor(target, dtype=torch.float32)
+
+
+        # Apply random rotation augmentation
+        if self.rotate:
+            k = random.randint(0, 3)  # Randomly choose between 0, 1, 2, or 3 90-degree rotations
+            inputs = np.rot90(inputs, k, axes=(0, 1))  # Rotate on the first two axes (x, y)
+            target = np.rot90(target, k, axes=(0, 1))
+        
+        inputs=torch.tensor(inputs.copy(), dtype=torch.float32)
+        target=torch.tensor(target.copy(), dtype=torch.float32)
 
         inputs=inputs.permute(2,0,1)
         target=target.permute(2,0,1)

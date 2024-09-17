@@ -122,8 +122,8 @@ def main(args):
     # device='cpu'
 
     # Load your dataset
-    train_dataset = SegmentationDataset(train_data,train_stat,args.target,args.input_vars,crop_size=args.crop_size,stat='min_max')
-    val_dataset = SegmentationDataset(val_data,val_stat,args.target,args.input_vars,crop_size=args.crop_size,stat='min_max')
+    train_dataset = SegmentationDataset(train_data,train_stat,args.target,args.input_vars,crop_size=args.crop_size,rotate=args.rotate,stat='min_max')
+    val_dataset = SegmentationDataset(val_data,val_stat,args.target,args.input_vars,crop_size=args.crop_size,rotate=args.rotate,stat='min_max')
 
     # Create DataLoader for training and validation
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size,shuffle=True)
@@ -176,7 +176,7 @@ def main(args):
             best_val_loss = val_loss
             torch.save(model.state_dict(), f'best_model_{args.model_name}.pth')
             print("Saved best model")
-            wandb.save(f'best_model_{args.model_name}.pth')
+            wandb.save(f'/home/udas/Desktop/UD_Data_Copy/Segmentation_Models/models/best_model_{args.model_name}.pth')
 
         
     wandb.finish()
@@ -195,6 +195,7 @@ if __name__ == "__main__":
     parser.add_argument('--target',type=str,default='burned_areas',help='target feature')
    
     parser.add_argument('--crop_size',type=int,default=32,help='crop size')
+    parser.add_argument('--rotate',type=bool,default=False,help='rotation')
     parser.add_argument('--desc',type=str,default='train',help='run description')
     parser.add_argument('--train_years',type=int,nargs='+',default=[2017,2018,2019,2020],help='train_years')
     parser.add_argument('--val_years',type=int,nargs='+',default=[2022],help='train_years')
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=16, help='Batch size')
     parser.add_argument('--epochs', type=int, default=25, help='Number of training epochs')
     parser.add_argument('--encoder_name', type=str, default='resnet34', help='Name of the encoder')
-    parser.add_argument('--model_name', type=str, default='FPN', choices=['Unet', 'FPN', 'PSPNet', 'DeepLabV3', 'PAN'], help='Segmentation model to use')
+    parser.add_argument('--model_name', type=str, default='FPN', choices=['Unet', 'FPN', 'PSPNet', 'DeepLabV3', 'PAN','MAnet','Unet++','DeepLabV3+'], help='Segmentation model to use')
 
 
     # Parse arguments
