@@ -3,13 +3,10 @@ import numpy as np
 import xarray as xr
 from datamodule import SegmentationDataset
 
-# def find_centroid(mask):
-#     moments = cv.moments(mask)
-#     if moments['m00'] == 0:
-#         return None
-#     centroid_x = moments['m10'] / moments['m00']
-#     centroid_y = moments['m01'] / moments['m00']
-#     return centroid_x, centroid_y
+def find_area(mask):
+    resolution=1
+    num_fire_cells=np.count_nonzero(mask)
+    return (num_fire_cells * resolution)
 
 def find_centroids(mask):
     # Find connected components
@@ -40,6 +37,21 @@ def visualise_centroid(mask, centroids):
             cv.circle(mask_color, (centroid_x, centroid_y), 0, (0, 0, 0), -1)  # Black circle
 
     return mask_color
+def compute_area_mse(predictions,ground_truth):
+    area_diff=[]
+    for i in range(predictions.shape[0]):
+        pred_mask = predictions[i, 0, :, :].detach().to('cpu').numpy()
+        gt_mask = ground_truth[i, 0, :, :].detach().to('cpu').numpy()
+
+        # Find centroids for both prediction and ground truth masks
+        pred_centroid = find_area(pred_mask)
+        gt_centroid = find_area(gt_mask)
+
+        area_mse=np.mean(np.square(pred_centroid-gt_centroid))
+        area_diff.append(area_mse)
+
+    return area_diff
+
 
 def compute_centroid_mse(predictions, ground_truth):
     centroid_distances = []

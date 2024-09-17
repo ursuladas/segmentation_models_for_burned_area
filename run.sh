@@ -26,7 +26,7 @@ BATCH_SIZE=16
 EPOCHS=25
 LEARNING_RATE=1e-4
 LOSS="BCE_raw"
-
+ROTATE=True
 # Run the Python script with the specified arguments
 python3 "$SCRIPT_PATH" \
   --root_dir "$ROOT_DIR" \
@@ -43,4 +43,5 @@ python3 "$SCRIPT_PATH" \
   --epochs "$EPOCHS" \
   --learning_rate "$LEARNING_RATE" \
   --loss "$LOSS" \
-  --desc "$MODEL_NAME"+"$LOSS"
+  --desc "$MODEL_NAME"+"$LOSS"  \
+  --rotate $ROTATE
